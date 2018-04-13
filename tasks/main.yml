@@ -1,0 +1,5 @@
+---
+# tasks file for aws-alb-tg
+- include: gather_facts.yml
+- include: tg.yml
+- include: alb.yml

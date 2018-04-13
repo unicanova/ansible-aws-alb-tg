@@ -1,0 +1,40 @@
+---
+
+# Create target group
+
+  - name: Create target group
+    elb_target_group:
+      region: "{{ aws_alb_tg_region }}"
+      name: "{{ aws_alb_tg_tg_name }}"
+      protocol: http
+      port: "{{ aws_alb_tg_tgport | default('80') }}"
+      vpc_id: "{{ aws_alb_tg_vpcid | default(omit) }}"
+      health_check_path: /
+      health_check_protocol: http
+      health_check_port: 80
+      health_check_interval: 5
+      health_check_timeout: 3
+      healthy_threshold_count: 2
+      successful_response_codes: "200"
+      state: "{{ aws_alb_tg_tgstate | default('present') }}"
+      wait_timeout: 200
+      modify_targets: false
+      wait: True
+    tags:
+      - target_group
+    register: tg
+
+
+  - name: Display all variables/facts known for a host
+    debug:
+      var: aws_alb_tg_fact_instance_ids
+      verbosity: 4
+
+  - name: register elb targets  
+    elb_target:
+      target_group_name: "{{ aws_alb_tg_tg_name }}"
+      target_id: "{{item}}"
+      state: present
+    with_items: aws_alb_tg_fact_instance_ids
+    tags:
+      - target_group

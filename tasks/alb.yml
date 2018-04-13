@@ -1,0 +1,37 @@
+---
+# Add target group to load balancer
+
+  - name: display vars
+    debug:
+      var: aws_alb_tg_fact_subnet_ids
+      verbosity: 4
+
+
+  - name: Create ALB
+    elb_application_lb:
+      name: "{{ aws_alb_tg_alb_name }}"
+      region: "{{ aws_alb_tg_region }}"
+      security_groups: "{{ aws_alb_tg_security_groups }}"
+      subnets: "{{ aws_alb_tg_fact_subnet_ids }}"
+      listeners: "{{ aws_alb_tg_alb_listeners }}"
+      state: present
+    tags:
+      - alb
+
+
+#  - name: create elb
+#    ec2_elb_lb:
+#    name: "{{ aws_alb_tg_alb_name }}"
+#    state: present
+#    subnets: "{{ aws_alb_tg_fact_subnet_ids }}"
+#    listeners: "{{ aws_alb_tg_alb_listeners }}"
+#      - protocol: http # options are http, https, ssl, tcp
+#        load_balancer_port: 80
+#        instance_port: 80
+#        proxy_protocol: True
+#      - protocol: https
+#        load_balancer_port: 443
+#        instance_protocol: http # optional, defaults to value of protocol setting
+#        instance_port: 80
+#        # ssl certificate required for https or ssl
+#        ssl_certificate_id: "arn:aws:iam::123456789012:server-certificate/company/servercerts/ProdServerCert"
