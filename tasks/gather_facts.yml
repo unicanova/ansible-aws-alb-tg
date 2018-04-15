@@ -2,11 +2,12 @@
 
 # Gather instance facts to register them in target group
 
-  - name: gather intance facts
+  - name: gather instance facts
     ec2_instance_facts:
       filters:
         "tag:Name": "{{ aws_alb_tg_instance_name }}"
         "tag:Type": "{{ aws_alb_tg_instance_env }}"
+      region: "{{ aws_alb_tg_region }}"
     register: aws_alb_tg_fact_instances
 
   - name: get subnet ids
@@ -26,9 +27,4 @@
             {% set ignored = res.append(l['instance_id']) -%}
           {%- endfor %}
           {{ res }}
-
-  - name: Display all variables/facts known for a host
-    debug:
-      var: aws_alb_tg_fact_subnet_ids
-      verbosity: 4
 

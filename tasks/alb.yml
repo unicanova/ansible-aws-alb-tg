@@ -1,23 +1,16 @@
 ---
 # Add target group to load balancer
 
-  - name: display vars
-    debug:
-      var: aws_alb_tg_fact_subnet_ids
-      verbosity: 4
-
-
   - name: Create ALB
     elb_application_lb:
       name: "{{ aws_alb_tg_alb_name }}"
       region: "{{ aws_alb_tg_region }}"
       security_groups: "{{ aws_alb_tg_security_groups }}"
-      subnets: "{{ aws_alb_tg_fact_subnet_ids }}"
+      subnets: "{{ aws_alb_tg_alb_subnet_ids | default(aws_alb_tg_fact_subnet_ids) }}"
       listeners: "{{ aws_alb_tg_alb_listeners }}"
       state: present
     tags:
       - alb
-
 
 #  - name: create elb
 #    ec2_elb_lb:

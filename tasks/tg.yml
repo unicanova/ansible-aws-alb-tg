@@ -6,12 +6,12 @@
     elb_target_group:
       region: "{{ aws_alb_tg_region }}"
       name: "{{ aws_alb_tg_tg_name }}"
-      protocol: http
-      port: "{{ aws_alb_tg_tgport | default('80') }}"
+      protocol: "{{ aws_alb_tg_tgprotocol | default('https') }}"
+      port: "{{ aws_alb_tg_tgport | default('443') }}"
       vpc_id: "{{ aws_alb_tg_vpcid | default(omit) }}"
       health_check_path: /
-      health_check_protocol: http
-      health_check_port: 80
+      health_check_protocol: "{{ aws_alb_tg_tgprotocol | default('https') }}"
+      health_check_port: "{{ aws_alb_tg_tgport | default('443') }}"
       health_check_interval: 5
       health_check_timeout: 3
       healthy_threshold_count: 2
@@ -24,17 +24,12 @@
       - target_group
     register: tg
 
-
-  - name: Display all variables/facts known for a host
-    debug:
-      var: aws_alb_tg_fact_instance_ids
-      verbosity: 4
-
   - name: register elb targets  
     elb_target:
+      region: "{{ aws_alb_tg_region }}"
       target_group_name: "{{ aws_alb_tg_tg_name }}"
-      target_id: "{{item}}"
+      target_id: "{{ item }}"
       state: present
-    with_items: aws_alb_tg_fact_instance_ids
+    with_items: "{{ aws_alb_tg_alb_instance_ids | default(aws_alb_tg_fact_instance_ids) }}"
     tags:
       - target_group
