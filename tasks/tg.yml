@@ -1,33 +1,39 @@
 ---
 
 # Create target group
+  - set_fact:
+      target_group_dict: "{{ item }}"
 
-  - name: Create target group
-    elb_target_group:
+  - name: display vars
+    debug:
+      var: target_group_dict
+      verbosity: 4
+
+  - elb_target_group:
       region: "{{ aws_alb_tg_region }}"
-      name: "{{ aws_alb_tg_tg_name }}"
-      protocol: "{{ aws_alb_tg_tgprotocol | default('https') }}"
-      port: "{{ aws_alb_tg_tgport | default('443') }}"
+      name: "{{ target_group_dict['name'] }}"
+      protocol: "{{ target_group_dict['protocol'] | default('http') }}"
+      port: "{{ target_group_dict['port'] | default('80') }}"
       vpc_id: "{{ aws_alb_tg_vpcid | default(omit) }}"
-      health_check_path: /
-      health_check_protocol: "{{ aws_alb_tg_tgprotocol | default('https') }}"
-      health_check_port: "{{ aws_alb_tg_tgport | default('443') }}"
-      health_check_interval: 5
-      health_check_timeout: 3
+      health_check_path: "{{ target_group_dict['health_check_path'] | default('/') }}"
+      health_check_protocol: "{{ target_group_dict['health_check_protocol'] | default('http') }}"
+      health_check_port: "{{ target_group_dict['health_check_port'] | default('80') }}"
+      health_check_interval: 10
+      health_check_timeout: 5
       healthy_threshold_count: 2
-      successful_response_codes: "200"
-      state: "{{ aws_alb_tg_tgstate | default('present') }}"
+      successful_response_codes: "200-299"
+      state: "{{ target_group_dict['state'] | default('present') }}"
       wait_timeout: 200
-      modify_targets: false
+      modify_targets: true
       wait: True
+      stickiness_enabled: "{{ target_group_dict['stickiness_enabled'] | default(omit) }}"
     tags:
       - target_group
     register: tg
 
-  - name: register elb targets  
-    elb_target:
+  - elb_target:
       region: "{{ aws_alb_tg_region }}"
-      target_group_name: "{{ aws_alb_tg_tg_name }}"
+      target_group_name: "{{ target_group_dict['name'] }}"
       target_id: "{{ item }}"
       state: present
     with_items: "{{ aws_alb_tg_alb_instance_ids | default(aws_alb_tg_fact_instance_ids) }}"

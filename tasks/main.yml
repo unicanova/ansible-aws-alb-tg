@@ -3,4 +3,5 @@
 - include: gather_facts.yml
   when: aws_alb_tg_fact_subnet_ids is undefined or aws_alb_tg_fact_instance_ids is undefined 
 - include: tg.yml
+  with_items: "{{ aws_alb_tg_target_groups }}"
 - include: alb.yml
