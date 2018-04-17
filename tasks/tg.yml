@@ -24,7 +24,7 @@
       successful_response_codes: "200-299"
       state: "{{ target_group_dict['state'] | default('present') }}"
       wait_timeout: 200
-      modify_targets: true
+      modify_targets: false
       wait: True
       stickiness_enabled: "{{ target_group_dict['stickiness_enabled'] | default(omit) }}"
     tags:
