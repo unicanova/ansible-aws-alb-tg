@@ -3,9 +3,11 @@
 This role create AWS target group with Application load balancer. You can enable support AWS Gather instance facts.
 
 ## Requirements
+```sh
 Ansible >= 2.5.0.0
 boto3
 Role Variables
+```
 
 main file which contains variables values
 
@@ -46,7 +48,7 @@ subnets: - subnets for
 ```
 
 ---
-Example Playbook
+#### Example Playbook
 Export enviroment variables with AWS credentials:
 
 ```sh
@@ -70,6 +72,7 @@ $ cd ..
 ```
 Edit ansible.cfg
 
+```sh
 [defaults]
 hostfile = ./hosts.cfg
 remote_user = constintine
@@ -85,10 +88,12 @@ Example playbook
     - name: Deploy AWS alb
       import_role:
         name: aws-alb-tg
+```
 Run anisble:
 
-ansible-playbook site.yaml -t test
-
+```sh
+$ ansible-playbook site.yaml -t test
+```
 License
 -------
 
