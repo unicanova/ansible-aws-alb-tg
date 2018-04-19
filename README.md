@@ -1,38 +1,106 @@
-Role Name
-=========
+## ansible-aws-alb-tg 
 
-A brief description of the role goes here.
+This role create AWS target group with Application load balancer. You can enable support AWS Gather instance facts.
 
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
-
+## Requirements
+Ansible >= 2.5.0.0
+boto3
 Role Variables
---------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+main file which contains variables values
 
-Dependencies
-------------
+vars/main.yml:
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+```sh
+---
+###values of variables uses in ALB and TG###
+aws_alb_tg_tg_name: test-target-group
+aws_alb_tg_tg_ws_name: test-target-group-ws
 
+aws_alb_tg_alb_name: test-alb-name
+aws_alb_tg_region: us-east-1 
+aws_alb_tg_instance_name: unicanova
+aws_alb_tg_instance_env: dev
+aws_alb_tg_security_groups: sg-1953db68
+aws_alb_tg_vpcid: vpc-5f97633b
+aws_alb_tg_alb_subnet_ids:
+  - subnet-c1de9aea
+  - subnet-7bfcac22
+aws_alb_tg_alb_listeners:
+  - Protocol: HTTPS
+    Port: 443
+    DefaultActions:
+      - Type: forward
+        TargetGroupName: "{{ aws_alb_tg_tg_name }}"
+    Certificates:
+      - CertificateArn: "arn:aws:acm:us-east-1:329942816198:certificate/338d2752-79c7-4cb6-a022-eb2f0d558704"
+    SslPolicy: ELBSecurityPolicy-2015-05
+
+aws_alb_tg_target_groups:
+  - name: "{{ aws_alb_tg_tg_name }}"
+  - name: "{{ aws_alb_tg_tg_ws_name }}"
+    stickiness_enabled: True
+subnets: - subnets for 
+  - "subnet-3a0d4877"
+  - "subnet-40b2993b"
+```
+
+---
 Example Playbook
-----------------
+Export enviroment variables with AWS credentials:
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```sh
+$ export AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
+$ export AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+```
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+Create dir when you clone ansible role from github:
+
+```sh
+$ mkdir -p example/roles
+cd example
+```
+
+Clone role repository from github and configure ansible:
+
+```sh
+$ cd roles
+$ git clone git@github.com:unicanova/unicanova/ansible-aws-alb-tg
+$ cd ..
+```
+Edit ansible.cfg
+
+[defaults]
+hostfile = ./hosts.cfg
+remote_user = constintine
+host_key_checking = False
+timeout = 5
+pipelining = True
+roles_path = .
+
+Example playbook
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Deploy AWS alb
+      import_role:
+        name: aws-alb-tg
+Run anisble:
+
+ansible-playbook site.yaml -t test
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
+Author: Konstantin Kalinovskyi
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Email: k@unicanova.com
+
+Company: UnicaNova 
+
+Website: https://unicanova.com/
+
